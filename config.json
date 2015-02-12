@@ -1,0 +1,9 @@
+{
+  "cassandra":{
+    "url":["localhost"],
+    "keyspace":"test"
+  },
+  "elasticsearch":{
+    "url":"localhost"
+  }
+}
