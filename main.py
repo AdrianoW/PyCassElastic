@@ -1,4 +1,4 @@
-from  syncCassElastic import SyncCassElastic
+from  pyCassElastic import SyncCassElastic
 from  utils import setupLog, getError
 import argparse
 

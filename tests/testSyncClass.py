@@ -10,7 +10,7 @@ import json
 # hack to test on a different dir
 import sys
 sys.path.append(dirname(abspath(__file__))+'/..')
-from syncCassElastic import SyncCassElastic, Cluster, Elasticsearch, BatchStatement
+from pyCassElastic import SyncCassElastic, Cluster, Elasticsearch, BatchStatement
 from utils import timeit
 
 class TestSyncClass(unittest.TestCase):
