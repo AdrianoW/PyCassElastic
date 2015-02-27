@@ -11,14 +11,26 @@
       "name":"sync_name1",
       "cassandra": {
         "table": "test.bogus",
-        "id_col":"key",
+        "id_col":"id",
         "date_col": "date",
-        "date_partition_col":"hourKey",
-        "date_partition_format":"%Y%m%d %H:%M"
+        "version_col":"version"
       },
       "elasticsearch":{
         "index": "bogus_index",
         "type": "bogusdoc"
+      }
+    },
+    {
+      "name":"sync_name2",
+      "cassandra": {
+        "table": "test.bogus2",
+        "id_col":"id",
+        "date_col": "date",
+        "version_col":"version"
+      },
+      "elasticsearch":{
+        "index": "bogus_index2",
+        "type": "bogusdoc2"
       }
     }
   ]

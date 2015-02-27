@@ -6,6 +6,7 @@
 import logging
 import traceback
 import time
+import datetime
 
 def setupLog(filename):
    # create logger with 'spam_application'
@@ -51,3 +52,22 @@ def timeit(method):
         return result
 
     return timed
+
+# http://stackoverflow.com/questions/16532566/how-to-insert-a-datetime-into-a-cassandra-1-2-timestamp-column
+def unix_time(dt):
+    '''
+    Convert to unix time
+    :param dt:
+    :return:
+    '''
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    delta = dt - epoch
+    return delta.total_seconds()
+
+def unix_time_millis(dt):
+    '''
+    Precision unix time
+    :param dt:
+    :return:
+    '''
+    return long(unix_time(dt) * 1000.0)
