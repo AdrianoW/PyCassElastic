@@ -1,0 +1,261 @@
+2015-02-27 12:38:42,073 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.04 sec
+2015-02-27 12:38:42,147 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.07 sec
+2015-02-27 12:38:42,152 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.00 sec
+2015-02-27 12:38:42,161 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 12:38:42,213 - INFO     - pyCassElastic.py    :164 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 12:38:42,213 - INFO     - pyCassElastic.py    :174 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 12:38:42,221 - INFO     - pyCassElastic.py    :71 - sync_name1 - Starting sync
+2015-02-27 12:38:42,246 - INFO     - pyCassElastic.py    :88 - sync_name1 - Ok: 3 Errors: 3) - Elastic >> Cassandra
+2015-02-27 12:38:42,246 - INFO     - pyCassElastic.py    :91 - sync_name1 - End sync
+2015-02-27 12:38:42,246 - INFO     - pyCassElastic.py    :92 - sync_name1 - Elapsed time 0.02 sec
+2015-02-27 12:38:42,246 - INFO     - pyCassElastic.py    :71 - sync_name2 - Starting sync
+2015-02-27 12:38:42,250 - ERROR    - pyCassElastic.py    :244 - Sync: sync_name2 - Step: insert_cassandra - Problem inserting data
+2015-02-27 12:38:42,251 - ERROR    - pyCassElastic.py    :246 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 12:38:42,251 - ERROR    - pyCassElastic.py    :247 - <traceback object at 0x7f9e6781b128>
+2015-02-27 12:38:42,253 - ERROR    - pyCassElastic.py    :209 - Sync: sync_name2 - Step: get_cassandra_latest - Table: test.bogus2 Problem getting data
+2015-02-27 12:38:42,253 - ERROR    - pyCassElastic.py    :211 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 12:38:42,253 - ERROR    - pyCassElastic.py    :212 - <traceback object at 0x7f9e6781b248>
+2015-02-27 12:38:42,253 - INFO     - pyCassElastic.py    :91 - sync_name2 - End sync
+2015-02-27 12:38:42,253 - INFO     - pyCassElastic.py    :92 - sync_name2 - Elapsed time 0.01 sec
+2015-02-27 12:38:42,253 - INFO     - pyCassElastic.py    :71 - sync_name3 - Starting sync
+2015-02-27 12:38:42,255 - ERROR    - pyCassElastic.py    :244 - Sync: sync_name3 - Step: insert_cassandra - Problem inserting data
+2015-02-27 12:38:42,255 - ERROR    - pyCassElastic.py    :246 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 12:38:42,255 - ERROR    - pyCassElastic.py    :247 - <traceback object at 0x7f9e6781b560>
+2015-02-27 12:38:42,256 - ERROR    - pyCassElastic.py    :209 - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 12:38:42,256 - ERROR    - pyCassElastic.py    :211 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 12:38:42,256 - ERROR    - pyCassElastic.py    :212 - <traceback object at 0x7f9e6781b5a8>
+2015-02-27 12:38:42,257 - INFO     - pyCassElastic.py    :91 - sync_name3 - End sync
+2015-02-27 12:38:42,257 - INFO     - pyCassElastic.py    :92 - sync_name3 - Elapsed time 0.00 sec
+2015-02-27 12:38:42,258 - INFO     - pyCassElastic.py    :114 - Disconnected from Cassandra
+2015-02-27 12:38:42,665 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.14 sec
+2015-02-27 12:38:42,725 - INFO     - pyCassElastic.py    :164 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 12:38:42,726 - INFO     - pyCassElastic.py    :174 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 12:38:43,119 - INFO     - pyCassElastic.py    :164 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 12:38:43,120 - INFO     - pyCassElastic.py    :174 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 12:38:43,257 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.14 sec
+2015-02-27 12:38:43,342 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.09 sec
+2015-02-27 12:38:43,704 - INFO     - pyCassElastic.py    :164 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 12:38:43,705 - INFO     - pyCassElastic.py    :174 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 12:38:43,707 - ERROR    - pyCassElastic.py    :209 - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 12:38:43,707 - ERROR    - pyCassElastic.py    :211 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 12:38:43,707 - ERROR    - pyCassElastic.py    :212 - <traceback object at 0x7f9e4c6898c0>
+2015-02-27 13:16:11,436 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.12 sec
+2015-02-27 13:16:11,572 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.14 sec
+2015-02-27 13:16:11,581 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.01 sec
+2015-02-27 13:16:11,593 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 13:16:11,890 - INFO     - pyCassElastic.py    :164 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 13:16:11,892 - INFO     - pyCassElastic.py    :174 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 13:16:11,909 - INFO     - pyCassElastic.py    :71 - sync_name1 - Starting sync
+2015-02-27 14:33:01,901 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.12 sec
+2015-02-27 14:33:02,042 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.14 sec
+2015-02-27 14:33:02,050 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.01 sec
+2015-02-27 14:33:02,062 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 14:33:02,371 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:02,373 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:33:02,391 - INFO     - pyCassElastic.py    :59 - sync_name1 - Starting sync
+2015-02-27 14:33:02,429 - INFO     - pyCassElastic.py    :68 - sync_name1 - Ok: 3 Errors: 0 - Elastic ----->> Cassandra
+2015-02-27 14:33:02,450 - INFO     - pyCassElastic.py    :76 - sync_name1 - Ok: 3 Errors: 3 - Elastic <<----- Cassandra 
+2015-02-27 14:33:02,451 - INFO     - pyCassElastic.py    :79 - sync_name1 - End sync
+2015-02-27 14:33:02,452 - INFO     - pyCassElastic.py    :80 - sync_name1 - Elapsed time 0.06 sec
+2015-02-27 14:33:02,453 - INFO     - pyCassElastic.py    :59 - sync_name2 - Starting sync
+2015-02-27 14:33:02,458 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name2 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:33:02,459 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:33:02,460 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7ff141015fc8>
+2015-02-27 14:33:02,466 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name2 - Step: get_cassandra_latest - Table: test.bogus2 Problem getting data
+2015-02-27 14:33:02,467 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:33:02,468 - INFO     - pyCassElastic.py    :79 - sync_name2 - End sync
+2015-02-27 14:33:02,469 - INFO     - pyCassElastic.py    :80 - sync_name2 - Elapsed time 0.01 sec
+2015-02-27 14:33:02,469 - INFO     - pyCassElastic.py    :59 - sync_name3 - Starting sync
+2015-02-27 14:33:02,473 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name3 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:33:02,473 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:33:02,474 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7ff141026368>
+2015-02-27 14:33:02,479 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 14:33:02,479 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:33:02,480 - INFO     - pyCassElastic.py    :79 - sync_name3 - End sync
+2015-02-27 14:33:02,481 - INFO     - pyCassElastic.py    :80 - sync_name3 - Elapsed time 0.01 sec
+2015-02-27 14:33:02,484 - INFO     - pyCassElastic.py    :102 - Disconnected from Cassandra
+2015-02-27 14:33:03,118 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.13 sec
+2015-02-27 14:33:03,418 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:03,420 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:33:04,318 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:04,320 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:33:04,444 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.12 sec
+2015-02-27 14:33:04,625 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.18 sec
+2015-02-27 14:33:05,541 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:05,543 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:33:42,809 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.11 sec
+2015-02-27 14:33:42,885 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.08 sec
+2015-02-27 14:33:42,890 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.00 sec
+2015-02-27 14:33:42,897 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 14:33:42,959 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:42,959 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:33:42,966 - INFO     - pyCassElastic.py    :59 - sync_name1 - Starting sync
+2015-02-27 14:33:42,982 - INFO     - pyCassElastic.py    :68 - sync_name1 - Ok: 3 Errors: 0 - Elastic ----->> Cassandra
+2015-02-27 14:33:42,997 - INFO     - pyCassElastic.py    :76 - sync_name1 - Ok: 3 Errors: 3 - Elastic <<----- Cassandra 
+2015-02-27 14:33:42,997 - INFO     - pyCassElastic.py    :79 - sync_name1 - End sync
+2015-02-27 14:33:42,998 - INFO     - pyCassElastic.py    :80 - sync_name1 - Elapsed time 0.03 sec
+2015-02-27 14:33:42,998 - INFO     - pyCassElastic.py    :59 - sync_name2 - Starting sync
+2015-02-27 14:33:43,000 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name2 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:33:43,001 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:33:43,001 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7f4c619d6d40>
+2015-02-27 14:33:43,002 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name2 - Step: get_cassandra_latest - Table: test.bogus2 Problem getting data
+2015-02-27 14:33:43,002 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:33:43,003 - INFO     - pyCassElastic.py    :79 - sync_name2 - End sync
+2015-02-27 14:33:43,003 - INFO     - pyCassElastic.py    :80 - sync_name2 - Elapsed time 0.00 sec
+2015-02-27 14:33:43,003 - INFO     - pyCassElastic.py    :59 - sync_name3 - Starting sync
+2015-02-27 14:33:43,004 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name3 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:33:43,005 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:33:43,005 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7f4c619d6e18>
+2015-02-27 14:33:43,006 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 14:33:43,006 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:33:43,006 - INFO     - pyCassElastic.py    :79 - sync_name3 - End sync
+2015-02-27 14:33:43,006 - INFO     - pyCassElastic.py    :80 - sync_name3 - Elapsed time 0.00 sec
+2015-02-27 14:33:43,007 - INFO     - pyCassElastic.py    :102 - Disconnected from Cassandra
+2015-02-27 14:33:43,312 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.07 sec
+2015-02-27 14:33:43,363 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:43,363 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:33:43,713 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:43,713 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:33:43,834 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.12 sec
+2015-02-27 14:33:43,907 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.07 sec
+2015-02-27 14:33:44,203 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:33:44,204 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:36:55,274 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.09 sec
+2015-02-27 14:36:55,406 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.13 sec
+2015-02-27 14:36:55,414 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.01 sec
+2015-02-27 14:36:55,427 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 14:36:55,723 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:36:55,724 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:36:55,740 - INFO     - pyCassElastic.py    :59 - sync_name1 - Starting sync
+2015-02-27 14:36:55,776 - INFO     - pyCassElastic.py    :68 - sync_name1 - Ok: 3 Errors: 0 - Elastic ----->> Cassandra
+2015-02-27 14:36:55,797 - INFO     - pyCassElastic.py    :76 - sync_name1 - Ok: 3 Errors: 3 - Elastic <<----- Cassandra 
+2015-02-27 14:36:55,799 - INFO     - pyCassElastic.py    :79 - sync_name1 - End sync
+2015-02-27 14:36:55,800 - INFO     - pyCassElastic.py    :80 - sync_name1 - Elapsed time 0.06 sec
+2015-02-27 14:36:55,800 - INFO     - pyCassElastic.py    :59 - sync_name2 - Starting sync
+2015-02-27 14:36:55,806 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name2 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:36:55,806 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:36:55,807 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7ffa80e3e9e0>
+2015-02-27 14:36:55,811 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name2 - Step: get_cassandra_latest - Table: test.bogus2 Problem getting data
+2015-02-27 14:36:55,812 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:36:55,813 - INFO     - pyCassElastic.py    :79 - sync_name2 - End sync
+2015-02-27 14:36:55,813 - INFO     - pyCassElastic.py    :80 - sync_name2 - Elapsed time 0.01 sec
+2015-02-27 14:36:55,814 - INFO     - pyCassElastic.py    :59 - sync_name3 - Starting sync
+2015-02-27 14:36:55,819 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name3 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:36:55,820 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:36:55,821 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7ffa80e3ed40>
+2015-02-27 14:36:55,826 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 14:36:55,826 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:36:55,827 - INFO     - pyCassElastic.py    :79 - sync_name3 - End sync
+2015-02-27 14:36:55,828 - INFO     - pyCassElastic.py    :80 - sync_name3 - Elapsed time 0.01 sec
+2015-02-27 14:36:55,830 - INFO     - pyCassElastic.py    :102 - Disconnected from Cassandra
+2015-02-27 14:36:56,424 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.13 sec
+2015-02-27 14:36:57,007 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:36:57,009 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:36:57,896 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:36:57,899 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:36:58,032 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.13 sec
+2015-02-27 14:36:58,213 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.18 sec
+2015-02-27 14:36:59,080 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:36:59,081 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:38:31,585 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.11 sec
+2015-02-27 14:38:31,712 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.13 sec
+2015-02-27 14:38:31,720 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.01 sec
+2015-02-27 14:38:31,734 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 14:38:32,344 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:38:32,346 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:38:32,365 - INFO     - pyCassElastic.py    :59 - sync_name1 - Starting sync
+2015-02-27 14:38:32,399 - INFO     - pyCassElastic.py    :68 - sync_name1 - Ok: 3 Errors: 0 - Elastic ----->> Cassandra
+2015-02-27 14:38:32,419 - INFO     - pyCassElastic.py    :76 - sync_name1 - Ok: 3 Errors: 3 - Elastic <<----- Cassandra 
+2015-02-27 14:38:32,420 - INFO     - pyCassElastic.py    :79 - sync_name1 - End sync
+2015-02-27 14:38:32,421 - INFO     - pyCassElastic.py    :80 - sync_name1 - Elapsed time 0.05 sec
+2015-02-27 14:38:32,422 - INFO     - pyCassElastic.py    :59 - sync_name2 - Starting sync
+2015-02-27 14:38:32,428 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name2 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:38:32,429 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:38:32,429 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7fe861dd70e0>
+2015-02-27 14:38:32,433 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name2 - Step: get_cassandra_latest - Table: test.bogus2 Problem getting data
+2015-02-27 14:38:32,434 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 14:38:32,435 - INFO     - pyCassElastic.py    :79 - sync_name2 - End sync
+2015-02-27 14:38:32,435 - INFO     - pyCassElastic.py    :80 - sync_name2 - Elapsed time 0.01 sec
+2015-02-27 14:38:32,436 - INFO     - pyCassElastic.py    :59 - sync_name3 - Starting sync
+2015-02-27 14:38:32,442 - ERROR    - pyCassElastic.py    :220 - Sync: sync_name3 - Step: insert_cassandra - Problem inserting data
+2015-02-27 14:38:32,443 - ERROR    - pyCassElastic.py    :222 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:38:32,443 - ERROR    - pyCassElastic.py    :223 - <traceback object at 0x7fe861dd7368>
+2015-02-27 14:38:32,448 - ERROR    - pyCassElastic.py    :185 - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 14:38:32,449 - ERROR    - pyCassElastic.py    :187 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 14:38:32,450 - INFO     - pyCassElastic.py    :79 - sync_name3 - End sync
+2015-02-27 14:38:32,450 - INFO     - pyCassElastic.py    :80 - sync_name3 - Elapsed time 0.01 sec
+2015-02-27 14:38:32,453 - INFO     - pyCassElastic.py    :102 - Disconnected from Cassandra
+2015-02-27 14:38:33,082 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.13 sec
+2015-02-27 14:38:33,378 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:38:33,379 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:38:34,288 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:38:34,290 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 14:38:34,400 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.11 sec
+2015-02-27 14:38:34,584 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.18 sec
+2015-02-27 14:38:35,496 - INFO     - pyCassElastic.py    :143 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 14:38:35,497 - INFO     - pyCassElastic.py    :150 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 15:17:09,582 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.10 sec
+2015-02-27 15:17:09,662 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.08 sec
+2015-02-27 15:17:09,666 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.00 sec
+2015-02-27 15:17:09,673 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 15:17:09,782 - INFO     - pyCassElastic.py    :144 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 15:17:09,782 - INFO     - pyCassElastic.py    :151 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 15:17:09,789 - INFO     - pyCassElastic.py    :60 - sync_name1 - Starting sync
+2015-02-27 15:17:09,807 - INFO     - pyCassElastic.py    :69 - sync_name1 - Ok: 3 Errors: 0 - Elastic ----->> Cassandra
+2015-02-27 15:17:09,818 - INFO     - pyCassElastic.py    :77 - sync_name1 - Ok: 3 Errors: 3 - Elastic <<----- Cassandra 
+2015-02-27 15:17:09,818 - INFO     - pyCassElastic.py    :80 - sync_name1 - End sync
+2015-02-27 15:17:09,818 - INFO     - pyCassElastic.py    :81 - sync_name1 - Elapsed time 0.03 sec
+2015-02-27 15:17:09,818 - INFO     - pyCassElastic.py    :60 - sync_name2 - Starting sync
+2015-02-27 15:17:09,820 - ERROR    - pyCassElastic.py    :221 - Sync: sync_name2 - Step: insert_cassandra - Problem inserting data
+2015-02-27 15:17:09,820 - ERROR    - pyCassElastic.py    :223 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 15:17:09,820 - ERROR    - pyCassElastic.py    :224 - <traceback object at 0x7fd5c51eb170>
+2015-02-27 15:17:09,822 - ERROR    - pyCassElastic.py    :186 - Sync: sync_name2 - Step: get_cassandra_latest - Table: test.bogus2 Problem getting data
+2015-02-27 15:17:09,822 - ERROR    - pyCassElastic.py    :188 - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 15:17:09,822 - INFO     - pyCassElastic.py    :80 - sync_name2 - End sync
+2015-02-27 15:17:09,822 - INFO     - pyCassElastic.py    :81 - sync_name2 - Elapsed time 0.00 sec
+2015-02-27 15:17:09,822 - INFO     - pyCassElastic.py    :60 - sync_name3 - Starting sync
+2015-02-27 15:17:09,824 - ERROR    - pyCassElastic.py    :221 - Sync: sync_name3 - Step: insert_cassandra - Problem inserting data
+2015-02-27 15:17:09,824 - ERROR    - pyCassElastic.py    :223 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 15:17:09,824 - ERROR    - pyCassElastic.py    :224 - <traceback object at 0x7fd5c51eb518>
+2015-02-27 15:17:09,825 - ERROR    - pyCassElastic.py    :186 - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 15:17:09,825 - ERROR    - pyCassElastic.py    :188 - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 15:17:09,825 - INFO     - pyCassElastic.py    :80 - sync_name3 - End sync
+2015-02-27 15:17:09,826 - INFO     - pyCassElastic.py    :81 - sync_name3 - Elapsed time 0.00 sec
+2015-02-27 15:17:09,827 - INFO     - pyCassElastic.py    :103 - Disconnected from Cassandra
+2015-02-27 15:17:10,157 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.07 sec
+2015-02-27 15:17:10,214 - INFO     - pyCassElastic.py    :144 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 15:17:10,215 - INFO     - pyCassElastic.py    :151 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 15:17:10,588 - INFO     - pyCassElastic.py    :144 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 15:17:10,589 - INFO     - pyCassElastic.py    :151 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 15:17:10,693 - INFO     - utils.py            :52 - '_createElasticSearchData' - executed in 0.10 sec
+2015-02-27 15:17:10,771 - INFO     - utils.py            :52 - '_createCassandraData' - executed in 0.08 sec
+2015-02-27 15:17:11,081 - INFO     - pyCassElastic.py    :144 - Connected to Cassandra: [u'localhost'] / test
+2015-02-27 15:17:11,082 - INFO     - pyCassElastic.py    :151 - Connected to Elasticsearch: [u'localhost']
+2015-02-27 15:33:58,703 - INFO     - '_createElasticSearchData' - executed in 0.10 sec
+2015-02-27 15:33:58,777 - INFO     - '_createCassandraData' - executed in 0.07 sec
+2015-02-27 15:33:58,782 - INFO     - '_createElasticSearchData' - executed in 0.00 sec
+2015-02-27 15:33:58,787 - INFO     - '_createCassandraData' - executed in 0.01 sec
+2015-02-27 15:33:58,845 - INFO     - sync_name1 - Starting sync
+2015-02-27 15:33:58,862 - INFO     - sync_name1 - Ok: 3 Errors: 0 - Elastic ----->> Cassandra
+2015-02-27 15:33:58,870 - INFO     - sync_name1 - Ok: 3 Errors: 3 - Elastic <<----- Cassandra 
+2015-02-27 15:33:58,871 - INFO     - sync_name1 - End sync
+2015-02-27 15:33:58,871 - INFO     - sync_name1 - Elapsed time 0.03 sec
+2015-02-27 15:33:58,871 - INFO     - sync_name2 - Starting sync
+2015-02-27 15:33:58,875 - ERROR    - Sync: sync_name2 - Step: insert_cassandra - Problem inserting data
+2015-02-27 15:33:58,875 - ERROR    - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 15:33:58,875 - ERROR    - <traceback object at 0x7f4ae8cc5d40>
+2015-02-27 15:33:58,880 - ERROR    - Sync: sync_name2 - Step: get_cassandra_latest - Table: test.bogus2 Problem getting data
+2015-02-27 15:33:58,880 - ERROR    - code=2200 [Invalid query] message="unconfigured columnfamily bogus2"
+2015-02-27 15:33:58,880 - INFO     - sync_name2 - End sync
+2015-02-27 15:33:58,880 - INFO     - sync_name2 - Elapsed time 0.01 sec
+2015-02-27 15:33:58,880 - INFO     - sync_name3 - Starting sync
+2015-02-27 15:33:58,882 - ERROR    - Sync: sync_name3 - Step: insert_cassandra - Problem inserting data
+2015-02-27 15:33:58,882 - ERROR    - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 15:33:58,882 - ERROR    - <traceback object at 0x7f4ae8cdf1b8>
+2015-02-27 15:33:58,884 - ERROR    - Sync: sync_name3 - Step: get_cassandra_latest - Table: test.bogus3 Problem getting data
+2015-02-27 15:33:58,884 - ERROR    - code=2200 [Invalid query] message="unconfigured columnfamily bogus3"
+2015-02-27 15:33:58,884 - INFO     - sync_name3 - End sync
+2015-02-27 15:33:58,884 - INFO     - sync_name3 - Elapsed time 0.00 sec
+2015-02-27 15:33:59,215 - INFO     - '_createCassandraData' - executed in 0.08 sec
+2015-02-27 15:33:59,705 - INFO     - '_createElasticSearchData' - executed in 0.10 sec
+2015-02-27 15:33:59,807 - INFO     - '_createCassandraData' - executed in 0.10 sec

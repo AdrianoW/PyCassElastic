@@ -9,6 +9,7 @@
   "syncs":[
     {
       "name":"sync_name1",
+      "comments": "from cassandra to elastic",
       "cassandra": {
         "table": "test.bogus",
         "id_col":"id",
@@ -22,6 +23,7 @@
     },
     {
       "name":"sync_name2",
+      "comments": "from elastic to cassandra",
       "cassandra": {
         "table": "test.bogus2",
         "id_col":"id",
@@ -31,6 +33,20 @@
       "elasticsearch":{
         "index": "bogus_index2",
         "type": "bogusdoc2"
+      }
+    },
+    {
+      "name":"sync_name3",
+      "comments": "this will fail!!",
+      "cassandra": {
+        "table": "test.bogus3",
+        "id_col":"id",
+        "date_col": "date",
+        "version_col":"version"
+      },
+      "elasticsearch":{
+        "index": "bogus_index3",
+        "type": "bogusdoc3"
       }
     }
   ]

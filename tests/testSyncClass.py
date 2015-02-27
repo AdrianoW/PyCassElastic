@@ -12,7 +12,7 @@ import sys
 
 sys.path.append(dirname(abspath(__file__)) + '/..')
 from  pyCassElastic import SyncCassElastic, Cluster, Elasticsearch, BatchStatement
-from utils import timeit, unix_time_millis
+from utils import timeit, unix_time_millis, setupLog
 
 
 class TestSyncClass(unittest.TestCase):
@@ -87,8 +87,8 @@ class TestSyncClass(unittest.TestCase):
         l.clear()
         minutes_ago = self._createLastRunFile()
         sync.setup()
-        l.check(('sync-cass-elastic', 'INFO', u"Connected to Cassandra: [u'localhost'] / test"),
-                ('sync-cass-elastic', 'INFO', u"Connected to Elasticsearch: [u'localhost']"), )
+        l.check(('sync-cass-elastic', 'DEBUG', u"Connected to Cassandra: [u'localhost'] / test"),
+                ('sync-cass-elastic', 'DEBUG', u"Connected to Elasticsearch: [u'localhost']"), )
         self.assertEqual(minutes_ago.strftime('%Y%m%d %H:%M'), sync.time_last_run.strftime('%Y%m%d %H:%M'),
                          'The time should be the same')
         self.assertNotEqual(sync.time_this_run, None, 'Time of this run should be filled')
@@ -97,6 +97,22 @@ class TestSyncClass(unittest.TestCase):
         # get rid of the logger checker
         l.uninstall()
         os.remove(sync.lastRunFileName) if os.path.exists(sync.lastRunFileName) else None
+
+    def testGetInsertErrors(self):
+        '''
+        Assure that with we have a problem with the insert or delete, the process will still go on, but log
+        the issues
+        '''
+        config = self.loadConfigFile('testConfig.json')
+        sync = SyncCassElastic(config)
+        self._createLastRunFile()
+
+        # run the setup
+        sync.setup()
+
+        # get information errors
+        #rows = sync.get_cassandra_latest(config['syncs'][2])
+
 
     def testFromCassandraToElastic(self):
         """
@@ -124,7 +140,6 @@ class TestSyncClass(unittest.TestCase):
     def testFromElasticToCassandra(self):
         '''
         Will check if data is being sent properly from elasticsearch to cassandra
-        :return:
         '''
         # initial setup for this test
         config = self.loadConfigFile('testConfig.json')
@@ -147,18 +162,54 @@ class TestSyncClass(unittest.TestCase):
         ok, errors = sync.insert_cassandra(config['syncs'][1], rows)
         self.assertEqual(ok, amount)
 
+        # TODO: check if data are the same
+
+    def testBothSides(self):
+        '''
+        Will check if data come and go correctly maintaining the last document
+        '''
+        # initial setup for this test
+        config = self.loadConfigFile('testConfig.json')
+        sync = SyncCassElastic(config)
+
+        # create last run file for 5 minutes ago
+        self._createLastRunFile()
+
+        # create data on C* and ES
+        two_min_ago = datetime.utcnow() - timedelta(minutes=2)
+        three_min_ago = datetime.utcnow() - timedelta(minutes=3)
+
+        # data will be kept
+        self._createElasticSearchData(config['syncs'][0], amount=3,
+                                      curr_time=two_min_ago)
+        self._createCassandraData(config['syncs'][0],  amount=3, start=10,
+                                      curr_time=two_min_ago)
+
+        # data will be overwritten
+        self._createElasticSearchData(config['syncs'][0], amount=3, start=10,
+                                      curr_time=three_min_ago)
+        self._createCassandraData(config['syncs'][0],  amount=3,
+                                      curr_time=three_min_ago, createTable=False)
+
+        # run forrest
+        sync.run()
+
+        # TODO: check if data are the same
+
+
 
     ######################################################
     # helpers
     ######################################################
     @timeit
-    def _createCassandraData(self, config, curr_time=None, createTable=True, amount=None):
+    def _createCassandraData(self, config, curr_time=None, createTable=True, amount=None, start=0):
         """
         Will create 'tables' and populate data
         :param config: configuration
-        :param currTime:
-        :param createTable:
-        :param amount:
+        :param currTime: time to create data
+        :param createTable: if the table should be created
+        :param amount: amount to be created
+        :param start: first id
         :return:
         """
         session = self.cassandra['session']
@@ -202,7 +253,7 @@ class TestSyncClass(unittest.TestCase):
         # add the prepared statements to a batch
         count = 0
         batch = BatchStatement()
-        for i in range(0, amount):
+        for i in range(start, start+amount):
             batch.add(data_statement,
                       [i, unix_time_millis(curr_time),
                        id_generator(10), 'CASSANDRA', unix_time_millis(curr_time),
@@ -222,9 +273,13 @@ class TestSyncClass(unittest.TestCase):
             batch._statements_and_parameters = []
 
     @timeit
-    def _createElasticSearchData(self, config, curr_time=None, amount=None):
+    def _createElasticSearchData(self, config, curr_time=None, amount=None, start=0):
         """
         Creates data on an index on Elasticsearch
+        :param config: configuration
+        :param currTime: time to create data
+        :param amount: amount to be created
+        :param start: first id
         :return:
         """
         es = self.elastic['session']
@@ -237,7 +292,7 @@ class TestSyncClass(unittest.TestCase):
 
         # create data
         data = []
-        for i in range(0, amount):
+        for i in range(start, amount):
             action = {'_type': params['type'],
                       '_id': i,
                       '_version_type': 'external',
@@ -256,9 +311,9 @@ class TestSyncClass(unittest.TestCase):
         es.indices.flush(index=params['index'])
 
     def _createLastRunFile(self):
-        '''
+        """
         Creates a dummy file with 15 minutes ago from now
-        '''
+        """
         minutesAgo = datetime.utcnow() - timedelta(minutes=5)
         sync = SyncCassElastic(self.config)
         os.remove(sync.lastRunFileName) if os.path.exists(sync.lastRunFileName) else None
@@ -268,10 +323,20 @@ class TestSyncClass(unittest.TestCase):
         return minutesAgo
 
     def loadConfigFile(self, filename):
-        '''
+        """
         will load a config file
         :param filename: json file to be opened
         :return:
-        '''
+        """
         with open(filename) as f:
             return json.load(f)
+
+    def checkDBSync(self):
+        """
+        Check if both dbs are ok.
+        """
+
+
+
+filename = abspath(__file__).replace('.py', '.log')
+log = setupLog(filename)

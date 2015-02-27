@@ -1,0 +1,26 @@
+{
+"cassandra":{
+    "url":["localhost"],
+    "keyspace":"test"
+  },
+  "elasticsearch":{
+    "url":["localhost"]
+  },
+  "syncs":[
+    {
+      "name":"sync_name1",
+      "comments": "from cassandra to elastic",
+      "cassandra": {
+        "table": "test.bogus",
+        "id_col":"id",
+        "date_col": "date",
+        "version_col":"version"
+      },
+      "elasticsearch":{
+        "index": "bogus_index",
+        "type": "bogusdoc"
+      }
+    }
+  ]
+
+}

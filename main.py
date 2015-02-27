@@ -11,7 +11,6 @@ def main(args):
     Will create the class and call the daemon
     :return: nothing
     '''
-    log.info('starting sync daemon')
     try:
         with open(args.config) as f:
             config = json.load(f)
@@ -20,10 +19,8 @@ def main(args):
         log.error(getError())
         exit(-1)
 
-    sync = SyncCassElastic(config).setup()
+    sync = SyncCassElastic(config)
     sync.run()
-
-
 
 # setup the logger
 filename = abspath(__file__).replace('.py', '.log')
