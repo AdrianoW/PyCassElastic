@@ -10,11 +10,12 @@
     {
       "name":"sync_name1",
       "comments": "from cassandra to elastic",
+      "id_col":"id",
+      "date_col": "date",
+      "version_col":"version",
+      "filter_date": false,
       "cassandra": {
-        "table": "test.bogus",
-        "id_col":"id",
-        "date_col": "date",
-        "version_col":"version"
+        "table": "bogus"
       },
       "elasticsearch":{
         "index": "bogus_index",
@@ -24,11 +25,11 @@
     {
       "name":"sync_name2",
       "comments": "from elastic to cassandra",
+      "id_col":"id",
+      "date_col": "date",
+      "version_col":"version",
       "cassandra": {
-        "table": "test.bogus2",
-        "id_col":"id",
-        "date_col": "date",
-        "version_col":"version"
+        "table": "bogus2"
       },
       "elasticsearch":{
         "index": "bogus_index2",
@@ -38,11 +39,11 @@
     {
       "name":"sync_name3",
       "comments": "this will fail!!",
+      "id_col":"id",
+      "date_col": "date",
+      "version_col":"version",
       "cassandra": {
-        "table": "test.bogus3",
-        "id_col":"id",
-        "date_col": "date",
-        "version_col":"version"
+        "table": "bogus3"
       },
       "elasticsearch":{
         "index": "bogus_index3",

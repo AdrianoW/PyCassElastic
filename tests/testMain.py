@@ -20,15 +20,15 @@ class TestMain(unittest.TestCase):
 
     def xtestParams(self):
         # assert parameter is missing
-        out, err = Popen(['python', 'main.py'], stdout=PIPE, stderr=PIPE).communicate()
+        out, err = Popen(['python', 'SyncCassElastic.py'], stdout=PIPE, stderr=PIPE).communicate()
         print err
         assert 'too few arguments' in err
 
         # assert there is no config
-        out, err = Popen(['python', 'main.py', 'any.json'], stdout=PIPE, stderr=PIPE).communicate()
+        out, err = Popen(['python', 'SyncCassElastic.py', 'any.json'], stdout=PIPE, stderr=PIPE).communicate()
         assert 'No such file' in err
 
-        out, err = Popen(['python', 'main.py', self.filename], stdout=PIPE, stderr=PIPE).communicate()
+        out, err = Popen(['python', 'SyncCassElastic.py', self.filename], stdout=PIPE, stderr=PIPE).communicate()
         assert 'No JSON' in err
 
 

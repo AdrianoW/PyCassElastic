@@ -1,16 +1,18 @@
 import logging
 from cassandra.cluster import Cluster, BatchStatement
+from cassandra.query import dict_factory
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 import time
-from utils import unix_time_millis
-from cassandra.query import dict_factory
+from utils import unix_time_millis, getError
+import uuid
+
 import sys
 
 log = logging.getLogger('sync-cass-elastic')
 
 
-class SyncCassElastic():
+class PyCassElastic():
     def __init__(self, config=None):
         """soc
         Syncronize the data from Cassandra to/from ElasticSearch
@@ -45,6 +47,9 @@ class SyncCassElastic():
         # get sync configuration
         self.sync = config.get('syncs')
 
+        # create elastic to c* mappings
+        self.es_to_cs = self._create_map()
+
     def run(self):
         """
         Run the sync process. This should be the only parameter called by the end user.
@@ -53,20 +58,14 @@ class SyncCassElastic():
         # setup the sync
         self.setup()
 
-        # TODO: if there is no sync on config file, try to sync all the col families/index with a predefined field
-
         # execute each of the syncs
         for sync in self.sync:
             log.info('%s - Starting sync' % sync['name'])
             ts = time.time()
 
-            # get the new info from elastic and write to cassandra
-            rows = self.get_elasticsearch_latest(sync)
-            if rows:
-                ok, errors = self.insert_cassandra(sync, rows)
-                if ok is not None and errors is not None:
-                    log.info('%s - Ok: %i Errors: %i - Elastic ----->> Cassandra'
-                             % (sync['name'], ok, errors))
+            # sync structures
+            if not self.sync_schemas(sync):
+                log.error('Unable to sync database schemas')
 
             # get the new info from cassandra and write to elastic
             rows = self.get_cassandra_latest(sync)
@@ -75,6 +74,14 @@ class SyncCassElastic():
                 if res:
                     log.info('%s - Ok: %i Errors: %i - Elastic <<----- Cassandra '
                              % (sync['name'], res[0], len(res[1])))
+
+            # get the new info from elastic and write to cassandra
+            rows = self.get_elasticsearch_latest(sync)
+            if rows:
+                ok, errors = self.insert_cassandra(sync, rows)
+                if ok is not None and errors is not None:
+                    log.info('%s - Ok: %i Errors: %i - Elastic ----->> Cassandra'
+                             % (sync['name'], ok, errors))
 
             te = time.time()
             log.info('%s - End sync' % sync['name'])
@@ -103,6 +110,8 @@ class SyncCassElastic():
             # https://datastax-oss.atlassian.net/browse/PYTHON-30
             # self.cassandra['cluster'].shutdown()
             log.debug('Disconnected from Cassandra')
+
+        self._write_this_run_time()
 
     def _get_last_run_time(self):
         """
@@ -162,32 +171,28 @@ class SyncCassElastic():
         session = self.cassandra['session']
         params = sync_params['cassandra']
 
-        # TODO: get the number of partition key values
-        # date_part_key_value = int(self.time_this_run.strftime(params['date_partition_format']))
-
         # construct the query and run it
         stmt = '''SELECT {fields_list}
                     FROM {table} '''
-
-        # WHERE {date_partition_col} = {date_part_key_value}
-        #   AND {date_col} >  {date_begin}
-        #   AND {date_col} <= {date_end}
-
         stmt = stmt.format(fields_list=(params.get('fields_list', '*')),
                            table=params['table'])
-        # date_partition_col = params['date_partition_col'],
-        # date_part_key_value = date_part_key_value,
-        # date_col = params['date_col'],
-        # date_begin = unix_time_millis(self.time_last_run),
-        # date_end = unix_time_millis(self.time_this_run))
+
+        # check if could filter
+        if sync_params.get('filter_date', None):
+            stmt += '''WHERE {date_col} > {time_last_run}
+                        AND {date_col} <= {time_this_run}
+                        ALLOW FILTERING'''
+
+            stmt = stmt.format(date_col=sync_params['date_col'],
+                               time_last_run=unix_time_millis(self.time_last_run),
+                               time_this_run=unix_time_millis(self.time_this_run))
 
         try:
             rows = session.execute(stmt)
         except:
             log.error('Sync: %s - Step: %s - Table: %s Problem getting data'
                       % (sync_params['name'], sys._getframe().f_code.co_name, params['table']))
-            exc_info = sys.exc_info()
-            log.error(exc_info[1])
+            log.error(getError())
             return None
         return rows
 
@@ -202,28 +207,41 @@ class SyncCassElastic():
         # helpers
         session = self.cassandra['session']
         params = sync_params['cassandra']
+        keyspace = self.cassandra['keyspace']
+
+        # get the table schema and remove the 3 fixed columns
+        schema = self._get_table_schema(keyspace, params['table'])
+        if not schema:
+            return None, None
+
+        cols = schema.keys()
+        #cols.remove(sync_params['version_col'])
+        #cols.remove(sync_params['id_col'])
+        #cols.remove(sync_params['date_col'])
+        cols.sort()
 
         # Prepare the statements
-        stmt = "INSERT INTO {table} (" \
-               "{id_col}, " \
-               "{version_col}, " \
-               "text, " \
-               "source, " \
-               "{date_col}) " \
-               "VALUES (?, ?, ?, ?, ?)" \
-               "USING TIMESTAMP ? "
-        stmt = stmt.format(table=params['table'],
-                           version_col=params['version_col'],
-                           id_col=params['id_col'],
-                           date_col=params['date_col'])
+        stmt = "INSERT INTO {keyspace}.{table} ("
+               # "{id_col}, " \
+               # "{version_col}, " \
+               # "{date_col},"
+        stmt += ", ".join(['%s' % k for k in cols])
+        stmt += ") VALUES ("
+        stmt += ", ".join([':' + k for k in cols])
+        stmt += ") USING TIMESTAMP :p_timestamp "
+        stmt = stmt.format(
+            keyspace=keyspace,
+            table=params['table']
+            # version_col=sync_params['version_col'],
+            # id_col=sync_params['id_col'],
+            # date_col=sync_params['date_col']
+        )
         try:
             data_statement = session.prepare(stmt)
         except:
             log.error('Sync: %s - Step: %s - Problem inserting data'
                       % (sync_params['name'], sys._getframe().f_code.co_name ))
-            exc_info = sys.exc_info()
-            log.error(exc_info[1])
-            log.error(exc_info[2])
+            log.error(getError())
             return None, None
 
         # add the prepared statements to a batch
@@ -231,15 +249,26 @@ class SyncCassElastic():
         total = 0
         errors = 0
         batch = BatchStatement()
+        cols.remove(sync_params['id_col'])
         for row in rows:
-            batch.add(data_statement,
-                      [int(row['_id']),
-                       row['_source']['version'],
-                       row['_source']['text'],
-                       row['_source']['source'],
-                       datetime.strptime(row['_source']['date'], '%Y-%m-%dT%H:%M:%S.%f'),
-                       row['_source']['version']])
-            count += 1
+            # convert to the cassandra structure
+            try:
+                # fill the data dictionary and put none on columns that are not present
+                data = {}
+                source = row['_source']
+                for col in cols:
+                    data[col] = source.get(col, None)
+                date = datetime.strptime(source[sync_params['date_col']],'%Y-%m-%dT%H:%M:%S.%f')
+                data[sync_params['id_col']] = uuid.UUID(row['_id'])
+                data[sync_params['date_col']] = unix_time_millis(date)
+                data['p_timestamp'] = data['version']
+                batch.add(data_statement,
+                          data)
+                count += 1
+            except:
+                log.error('Problem converting data {}'.format(row['_id']))
+                log.error(getError())
+                continue
 
             # every x records, commit. There is a limitation on the driver
             if (count % 65000) == 0:
@@ -265,8 +294,7 @@ class SyncCassElastic():
             except:
                 log.error('Sync: %s - Step: %s - Problem inserting data'
                           % (sync_params['name'], sys._getframe().f_code.co_name ))
-                exc_info = sys.exc_info()
-                log.error(exc_info[1])
+                log.error(getError())
                 errors += count
 
         return total, errors
@@ -282,7 +310,6 @@ class SyncCassElastic():
         # get configuration
         es = self.elastic['session']
         es_params = sync_params['elasticsearch']
-        cs_params = sync_params['cassandra']
 
         # crate indice and ignore error if it exists already
         es.indices.create(index=es_params['index'], ignore=400)
@@ -291,17 +318,14 @@ class SyncCassElastic():
         data = []
         for row in rows:
             # insert information trusting that es will correctly get types
+            uid = row[sync_params['id_col']]
+            del row[sync_params['id_col']]
             action = {
                 '_type': es_params['type'],
-                '_id': row[cs_params['id_col']],
+                '_id': str(uid),
                 '_version_type': 'external',
-                '_version': row[cs_params['version_col']],
-                '_source': {
-                    'text': row['text'],
-                    'source': row['source'],
-                    'date': row['date'],
-                    'version': row[cs_params['version_col']]
-                }
+                '_version': row[sync_params['version_col']],
+                '_source': row
             }
             data.append(action)
 
@@ -312,8 +336,7 @@ class SyncCassElastic():
         except:
             log.error('Sync: %s - Step: %s - Problem inserting data'
                       % (sync_params['name'], sys._getframe().f_code.co_name))
-            exc_info = sys.exc_info()
-            log.error(exc_info[1])
+            log.error(getError())
             return None
 
     def get_elasticsearch_latest(self, sync_params):
@@ -325,7 +348,6 @@ class SyncCassElastic():
         # get configuration
         es = self.elastic['session']
         es_params = sync_params['elasticsearch']
-        cs_params = sync_params['cassandra']
 
         # construct query params
         query = {
@@ -333,7 +355,7 @@ class SyncCassElastic():
                 "constant_score": {
                     "filter": {
                         "range": {
-                            cs_params['version_col']: {
+                            sync_params['version_col']: {
                                 "gte": unix_time_millis(self.time_last_run),
                                 "lte": unix_time_millis(self.time_this_run)
                             }
@@ -347,9 +369,104 @@ class SyncCassElastic():
         try:
             res = helpers.scan(es, query=query, index=es_params['index'])
             return res
-        except Exception, e:
+        except:
             log.error('Sync: %s - Step: %s - Problem getting data'
                       % (sync_params['name'], sys._getframe().f_code.co_name ))
-            exc_info = sys.exc_info()
-            log.error(exc_info[1])
+            log.error(getError())
             return None
+
+    def sync_schemas(self, sync_params):
+        """
+        Check if the tables are the same and sync them if needed
+        :param sync_params: the process it is being run
+        :return: True if sync was successful
+        """
+        # helpers
+        session = self.cassandra['session']
+        es_params = sync_params['elasticsearch']
+        cs_params = sync_params['cassandra']
+        keyspace = self.cassandra['keyspace']
+        table = cs_params['table']
+
+        # create structures and compare them
+        t_schema = self._get_table_schema(keyspace, table)
+        d_schema = self._get_doc_schema(es_params['index'], es_params['type'])
+
+        if not t_schema or not d_schema:
+            return False
+
+        # remove the id columns and check if structures are the same
+        del t_schema[sync_params['id_col']]
+        if len(d_schema.keys()) > len(t_schema.keys()):
+            for col in d_schema.keys():
+                if col not in t_schema:
+                    # add column
+                    stmt = '''ALTER TABLE {keyspace}.{table} ADD {column} {type}'''.format(
+                        keyspace=keyspace,
+                        table=table,
+                        column=col,
+                        type=self.es_to_cs[d_schema[col]]
+                    )
+                    session.execute(stmt)
+
+        return True
+
+    def _get_table_schema(self, keyspace, table):
+        """
+        Create a dict with the table schema
+        :param keyspace: cassandra keyspace
+        :param table: table to get schema
+        :return:
+        """
+        # get the information
+        cluster = self.cassandra['cluster']
+        try:
+            schema = cluster.metadata.keyspaces[keyspace].tables[table]
+        except:
+            log.error('Keyspace: %s - Table: %s - Schema does not exists' % (keyspace, table))
+            log.error(getError())
+            return None
+
+        # create the structure
+        ret = {}
+        for c in schema.columns:
+            ret[c] = schema.columns[c].typestring
+
+        return ret
+
+    def _get_doc_schema(self, index, doc_type):
+        """
+        Create a dict with the doc schema
+        :param index: index where the doc is
+        :param doc_type: the doc to get the schema
+        :return:
+        """
+        # make sure the index is refreshed.
+        es = self.elastic['session']
+        es.indices.refresh(index=index, ignore=[400, 404])
+
+        # create the structure
+        ret = {}
+        try:
+            schema = es.indices.get_mapping(index=index, doc_type=doc_type)
+            cols = schema[index]['mappings'][doc_type]['properties']
+        except:
+            log.error('Index: %s - Doc: %s - Schema does not exists' % (index, doc_type))
+            log.error(getError())
+            return None
+
+        for c in cols:
+            ret[c] = cols[c]['type']
+
+        return ret
+
+    @staticmethod
+    def _create_map():
+        """
+        Create the mapping from elasticsearch types to cassandra types
+        :return:
+        """
+        # TODO: make bigger mapping, for all types
+        return {
+            'string': 'varchar'
+        }

@@ -15,7 +15,7 @@ def setupLog(filename):
 
     # create file handler which logs even debug messages
     fh = logging.FileHandler(filename)
-    fh.setLevel(logging.INFO)
+    fh.setLevel(logging.DEBUG)
 
     # create console handler with a higher log level
     ch = logging.StreamHandler()
