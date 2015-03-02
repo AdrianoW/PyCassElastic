@@ -40,7 +40,7 @@ class TestSyncClass(unittest.TestCase):
         # save for later
         cas = {'cluster': clus, 'session': sess, 'keyspace': cassandra['keyspace']}
         self.cassandra = cas
-        self.data_amt = 5000
+        self.data_amt = 10000
         self.idList = self._generateIDs(self.data_amt)
 
         # connect to elasticsearch and create the data
@@ -364,7 +364,7 @@ class TestSyncClass(unittest.TestCase):
 
             # check if it will use date as a filter
             if config.get('filter_date', None):
-                primary_key = '(%s), %s' % (config['id_col'], config['version_col'])
+                primary_key = '%s, %s' % (config['id_col'], config['version_col'])
             else:
                 primary_key = config['id_col']
             stmt = stmt.format(keyspace=keyspace,
@@ -481,5 +481,5 @@ class TestSyncClass(unittest.TestCase):
         return self.idList
 
 
-filename = abspath(__file__).replace('.py', '.log')
+filename = 'testSyncClass.log'
 log = setupLog(filename)

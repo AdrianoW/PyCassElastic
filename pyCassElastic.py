@@ -69,13 +69,18 @@ class PyCassElastic():
                 log.error('Unable to sync database schemas')
 
             # get the new info from cassandra and write to elastic
+            ts1 = ts = time.time()
+            log.info('Cassandra ----->> Elastic')
             rows = self.get_cassandra_latest(sync)
+            log.debug('Elaspsed time %2.2f' % (time.time() - ts1))
             if rows:
                 res = self.insert_elasticsearch(sync, rows)
+                log.debug('Elaspsed time %2.2f' % (time.time() - ts1))
 
                 # is using data as a parameter, delete on C* data that exists on Elastic
                 if sync.get('filter_date', None):
                     ok, errors = self._delete_cassandra_records(sync, res)
+                    log.debug('Elaspsed time %2.2f' % (time.time() - ts1))
 
                     # if there were errors deleting the data, do not continue sync or data will be duplicated
                     if errors is None or errors > 0:
@@ -85,20 +90,26 @@ class PyCassElastic():
                     ok = res[0]
                     errors = len(res[1])
 
-                log.info('%s - Ok: %i Errors: %i - Elastic <<----- Cassandra '
+                log.info('%s - Ok: %i Errors: %i'
                          % (sync['name'], ok, errors))
+                log.info('Elaspsed time %2.2f' % (time.time() - ts1))
 
             # get the new info from elastic and write to cassandra
+            ts1 = ts = time.time()
+            log.info('Cassandra <<----- Elastic')
             rows = self.get_elasticsearch_latest(sync)
+            log.debug('Elaspsed time %2.2f' % (time.time() - ts1))
             if rows:
                 ok, errors = self.insert_cassandra(sync, rows)
+                log.debug('Elaspsed time %2.2f' % (time.time() - ts1))
                 if ok is not None and errors is not None:
-                    log.info('%s - Ok: %i Errors: %i - Elastic ----->> Cassandra'
+                    log.info('%s - Ok: %i Errors: %i'
                              % (sync['name'], ok, errors))
+                    log.info('Elaspsed time %2.2f' % (time.time() - ts1))
 
             te = time.time()
             log.info('%s - End sync' % sync['name'])
-            log.info('%s - Elapsed time %2.2f sec' % (sync['name'], te - ts))
+            log.info('%s - Total elapsed time %2.2f sec' % (sync['name'], te - ts))
 
         # do the cleanup
         self.shutdown()
@@ -357,16 +368,35 @@ class PyCassElastic():
             "query": {
                 "constant_score": {
                     "filter": {
-                        "range": {
-                            sync_params['version_col']: {
-                                "gte": unix_time_millis(self.time_last_run),
-                                "lte": unix_time_millis(self.time_this_run)
-                            }
-                        }
+                        "and": [
+                            {
+                                "range": {
+                                    sync_params['version_col']: {
+                                        "gte": unix_time_millis(self.time_last_run),
+                                        "lte": unix_time_millis(self.time_this_run)
+                                    }
+                                }
+                            },
+                        ]
                     }
                 }
             }
         }
+
+        # check if it should ignore the information that came from the same source that I am taking information to.
+        ignore_source = sync_params.get( 'ignore_same_source', None)
+        source_id = sync_params['cassandra'].get('source_id',None)
+        if ignore_source:
+            if source_id:
+                query['query']['constant_score']['filter']['and'].append({
+                            "not": {
+                                "term": {
+                                    "source": source_id
+                                }
+                            }
+                        })
+            else:
+                log.warning('ignore_same_source set but no source_id given for the Cassandra data')
 
         # execute using scan to get all rows, unordered
         try:
