@@ -1,0 +1,41 @@
+2015-03-02 04:07:34,143 - INFO     - '_createElasticSearchData' - executed in 2.40 sec
+2015-03-02 04:07:37,752 - INFO     - '_createCassandraData' - executed in 3.61 sec
+2015-03-02 04:07:40,098 - INFO     - '_createElasticSearchData' - executed in 2.34 sec
+2015-03-02 04:07:43,482 - INFO     - '_createCassandraData' - executed in 3.38 sec
+2015-03-02 04:07:43,784 - INFO     - sync_name1 - Starting sync
+2015-03-02 04:07:43,790 - INFO     - Cassandra ----->> Elastic
+2015-03-02 04:07:50,963 - INFO     - sync_name1 - Ok: 5000 Errors: 0
+2015-03-02 04:07:50,964 - INFO     - Elaspsed time 7.17
+2015-03-02 04:07:50,964 - INFO     - Cassandra <<----- Elastic
+2015-03-02 04:07:54,746 - INFO     - sync_name1 - Ok: 5000 Errors: 0
+2015-03-02 04:07:54,747 - INFO     - Elaspsed time 3.78
+2015-03-02 04:07:54,747 - INFO     - sync_name1 - End sync
+2015-03-02 04:07:54,748 - INFO     - sync_name1 - Total elapsed time 3.78 sec
+2015-03-02 04:07:54,748 - INFO     - sync_name2 - Starting sync
+2015-03-02 04:07:54,749 - ERROR    - Keyspace: test - Table: bogus2 - Schema does not exists
+2015-03-02 04:07:54,750 - ERROR    - ['    schema = cluster.metadata.keyspaces[keyspace].tables[table]', "KeyError: u'bogus2'"]
+2015-03-02 04:07:54,755 - ERROR    - Index: bogus_index2 - Doc: bogusdoc2 - Schema does not exists
+2015-03-02 04:07:54,756 - ERROR    - ['    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)', "NotFoundError: TransportError(404, u'IndexMissingException[[bogus_index2] missing]')"]
+2015-03-02 04:07:54,757 - ERROR    - Unable to sync database schemas
+2015-03-02 04:07:54,757 - INFO     - Cassandra ----->> Elastic
+2015-03-02 04:07:54,759 - ERROR    - Sync: sync_name2 - Step: get_cassandra_latest - Table: bogus2 Problem getting data
+2015-03-02 04:07:54,761 - ERROR    - ['    raise self._final_exception', 'InvalidRequest: code=2200 [Invalid query] message="unconfigured columnfamily bogus2"']
+2015-03-02 04:07:54,762 - INFO     - Cassandra <<----- Elastic
+2015-03-02 04:07:54,764 - ERROR    - Sync: sync_name2 - Step: get_elasticsearch_latest - Problem getting data
+2015-03-02 04:07:54,765 - ERROR    - ['    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)', "NotFoundError: TransportError(404, u'IndexMissingException[[bogus_index2] missing]')"]
+2015-03-02 04:07:54,765 - INFO     - sync_name2 - End sync
+2015-03-02 04:07:54,766 - INFO     - sync_name2 - Total elapsed time 0.00 sec
+2015-03-02 04:07:54,766 - INFO     - sync_name3 - Starting sync
+2015-03-02 04:07:54,767 - ERROR    - Keyspace: test - Table: bogus3 - Schema does not exists
+2015-03-02 04:07:54,767 - ERROR    - ['    schema = cluster.metadata.keyspaces[keyspace].tables[table]', "KeyError: u'bogus3'"]
+2015-03-02 04:07:54,772 - ERROR    - Index: bogus_index3 - Doc: bogusdoc3 - Schema does not exists
+2015-03-02 04:07:54,773 - ERROR    - ['    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)', "NotFoundError: TransportError(404, u'IndexMissingException[[bogus_index3] missing]')"]
+2015-03-02 04:07:54,773 - ERROR    - Unable to sync database schemas
+2015-03-02 04:07:54,774 - INFO     - Cassandra ----->> Elastic
+2015-03-02 04:07:54,779 - ERROR    - Sync: sync_name3 - Step: get_cassandra_latest - Table: bogus3 Problem getting data
+2015-03-02 04:07:54,779 - ERROR    - ['    raise self._final_exception', 'InvalidRequest: code=2200 [Invalid query] message="unconfigured columnfamily bogus3"']
+2015-03-02 04:07:54,780 - INFO     - Cassandra <<----- Elastic
+2015-03-02 04:07:54,783 - ERROR    - Sync: sync_name3 - Step: get_elasticsearch_latest - Problem getting data
+2015-03-02 04:07:54,784 - ERROR    - ['    raise HTTP_EXCEPTIONS.get(status_code, TransportError)(status_code, error_message, additional_info)', "NotFoundError: TransportError(404, u'IndexMissingException[[bogus_index3] missing]')"]
+2015-03-02 04:07:54,785 - INFO     - sync_name3 - End sync
+2015-03-02 04:07:54,785 - INFO     - sync_name3 - Total elapsed time 0.00 sec

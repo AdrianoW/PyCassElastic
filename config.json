@@ -14,12 +14,16 @@
       "id_col":"id",
       "date_col": "date",
       "version_col":"version",
+      "filter_date": true,
+      "ignore_same_source": true,
       "cassandra": {
-        "table": "bogus"
+        "table": "bogus",
+        "source_id":"cassandra"
       },
       "elasticsearch":{
         "index": "bogus_index",
-        "type": "bogusdoc"
+        "type": "bogusdoc",
+        "source_id":"elastic"
       }
     }
   ]
