@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from elasticsearch.helpers import bulk
 import json
 from cassandra.query import dict_factory
+from cassandra.policies import RetryPolicy
 import uuid
 from time import sleep
 
@@ -31,14 +32,15 @@ class TestSyncClass(unittest.TestCase):
 
         # create cassandra structure
         cassandra = self.config['cassandra']
-        clus = Cluster(cassandra['url'])
+        clus = Cluster(cassandra['url'], default_retry_policy=RetryPolicy())
         sess = clus.connect()
         sess.row_factory = dict_factory
+        sess.default_timeout = None
 
         # save for later
         cas = {'cluster': clus, 'session': sess, 'keyspace': cassandra['keyspace']}
         self.cassandra = cas
-        self.data_amt = 10000
+        self.data_amt = 5000
         self.idList = self._generateIDs(self.data_amt)
 
         # connect to elasticsearch and create the data
@@ -111,16 +113,16 @@ class TestSyncClass(unittest.TestCase):
         Will create data on cassandra and send to elastic search
         """
         config = self.loadConfigFile('testConfig.json')
-        session = self.cassandra['session']
         sync = PyCassElastic(config)
+        sync_params = config['syncs'][0]
         self._createLastRunFile()
 
         # create the data on cassandra two minutes ago
         two_minutes_ago = datetime.utcnow() - timedelta(minutes=2)
         ten_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
-        self._createCassandraData(config['syncs'][0], two_minutes_ago, amount=self.data_amt / 2)
+        self._createCassandraData(sync_params, two_minutes_ago, amount=self.data_amt / 2)
         self._createCassandraData(
-            config['syncs'][0],
+            sync_params,
             amount=self.data_amt / 2,
             curr_time=ten_minutes_ago,
             start=self.data_amt / 2,
@@ -131,18 +133,17 @@ class TestSyncClass(unittest.TestCase):
         sync.setup()
 
         # assert the amount found
-        cs_param = config['syncs'][0]['cassandra']
-        rows = sync.get_cassandra_latest(config['syncs'][0])
-        ret = session.execute("select count(*) from %s.%s" %
-                              (self.cassandra['keyspace'], cs_param['table']))
-        self.assertEqual(ret[0]['count'], self.data_amt)
+        rows = sync.get_cassandra_latest(sync_params)
 
-        # check the results
-        ok, errors = sync.insert_elasticsearch(config['syncs'][0], rows)
-        self.assertEqual(ok, self.data_amt)
+        # check if it will use date as a filter
+        ok, errors = sync.insert_elasticsearch(sync_params, rows)
+        if sync_params.get('filter_date', None):
+            self.assertEqual(ok, self.data_amt / 2)
+        else:
+            self.assertEqual(ok, self.data_amt)
 
         # check if data is the same
-        ret = self.checkSync(sync, config['syncs'][0])
+        ret = self.checkSync(sync, sync_params)
         self.assertEquals(ret, -1,
                           'The DBs data should be the same. Error on id %s' % ret)
 
@@ -183,6 +184,7 @@ class TestSyncClass(unittest.TestCase):
         # initial setup for this test
         config = self.loadConfigFile('testConfig.json')
         sync = PyCassElastic(config)
+        sync_params = config['syncs'][0]
 
         # create last run file for 5 minutes ago
         self._createLastRunFile()
@@ -192,22 +194,22 @@ class TestSyncClass(unittest.TestCase):
         three_min_ago = datetime.utcnow() - timedelta(minutes=3)
 
         # data will be kept
-        self._createElasticSearchData(config['syncs'][0], amount=self.data_amt / 2,
+        self._createElasticSearchData(sync_params, amount=self.data_amt / 2,
                                       curr_time=two_min_ago)
-        self._createCassandraData(config['syncs'][0], amount=self.data_amt / 2, start=self.data_amt / 2,
+        self._createCassandraData(sync_params, amount=self.data_amt / 2, start=self.data_amt / 2,
                                   curr_time=two_min_ago)
 
         # data will be overwritten
-        self._createElasticSearchData(config['syncs'][0], amount=self.data_amt / 2, start=self.data_amt / 2,
+        self._createElasticSearchData(sync_params, amount=self.data_amt / 2, start=self.data_amt / 2,
                                       curr_time=three_min_ago)
-        self._createCassandraData(config['syncs'][0], amount=self.data_amt / 2,
+        self._createCassandraData(sync_params, amount=self.data_amt / 2,
                                   curr_time=three_min_ago, create_table=False)
 
         # run forrest
         sync.run()
 
         # check if data is the same
-        ret = self.checkSync(sync, config['syncs'][0])
+        ret = self.checkSync(sync, sync_params)
         self.assertEquals(ret, -1,
                           'The DBs data should be the same. Error on id %s' % ret)
 
@@ -228,9 +230,9 @@ class TestSyncClass(unittest.TestCase):
         two_min_ago = datetime.utcnow() - timedelta(minutes=2)
         self._createLastRunFile()
 
-        self._createElasticSearchData(sync_params, amount=3,
+        self._createElasticSearchData(sync_params, amount=self.data_amt / 2,
                                       curr_time=two_min_ago)
-        self._createCassandraData(sync_params, amount=3, start=10,
+        self._createCassandraData(sync_params, amount=(self.data_amt / 2) - 1, start=self.data_amt / 2,
                                   curr_time=two_min_ago)
 
         # TODO: put different column types to check
@@ -264,7 +266,6 @@ class TestSyncClass(unittest.TestCase):
 
         # remove new column for other tests
         session.execute("""ALTER TABLE test.bogus DROP new_col""")
-
 
     ######################################################
     # helpers
@@ -358,14 +359,23 @@ class TestSyncClass(unittest.TestCase):
                           text varchar,
                           source varchar,
                           {date_col} timestamp,
-                          PRIMARY KEY ({id_col})
+                          PRIMARY KEY ({primary_key})
                         );'''
+
+            # check if it will use date as a filter
+            if config.get('filter_date', None):
+                primary_key = '(%s), %s' % (config['id_col'], config['version_col'])
+            else:
+                primary_key = config['id_col']
             stmt = stmt.format(keyspace=keyspace,
                                table=params['table'],
                                version_col=config['version_col'],
                                id_col=config['id_col'],
-                               date_col=config['date_col'])
+                               date_col=config['date_col'],
+                               primary_key=primary_key)
             session.execute(stmt)
+            if config.get('filter_date', None):
+                session.execute('CREATE INDEX ON %s.%s (%s)' % (keyspace, params['table'], config['version_col']))
 
         # Prepare the statements
         stmt = "INSERT INTO {keyspace}.{table} (" \
@@ -396,7 +406,7 @@ class TestSyncClass(unittest.TestCase):
             count += 1
 
             # every x records, commit. The parameter 65000 was giving timeout
-            if (count % 65000) == 0:
+            if (count % 5000) == 0:
                 # execute the batch
                 session.execute(batch)
                 # hack to get around the 65k limit of python driver

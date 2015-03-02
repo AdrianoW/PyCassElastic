@@ -71,3 +71,4 @@ if __name__ == '__main__':
         main(config_file)
     except:
         log.error(getError())
+        log.info('Exiting. Bye')

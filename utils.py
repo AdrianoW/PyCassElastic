@@ -18,16 +18,16 @@ def setupLog(filename):
     fh.setLevel(logging.DEBUG)
 
     # create console handler with a higher log level
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    #ch = logging.StreamHandler()
+    #ch.setLevel(logging.DEBUG)
 
     # create formatter and add it to the handlers
     fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)-8s - %(message)s'))
-    ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)-8s - [ %(filename)-20s:%(lineno)s - %(funcName)-10s() ] %(message)s'))
+    #ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)-8s - [ %(filename)-20s:%(lineno)s - %(funcName)-10s() ] %(message)s'))
 
     # add the handlers to the logger
     logger.addHandler(fh)
-    logger.addHandler(ch)
+    #logger.addHandler(ch)
 
     # create file handler which logs even debug messages
     return logger

@@ -6,6 +6,7 @@ from datetime import datetime
 import time
 from utils import unix_time_millis, getError
 import uuid
+import re
 
 import sys
 
@@ -71,9 +72,21 @@ class PyCassElastic():
             rows = self.get_cassandra_latest(sync)
             if rows:
                 res = self.insert_elasticsearch(sync, rows)
-                if res:
-                    log.info('%s - Ok: %i Errors: %i - Elastic <<----- Cassandra '
-                             % (sync['name'], res[0], len(res[1])))
+
+                # is using data as a parameter, delete on C* data that exists on Elastic
+                if sync.get('filter_date', None):
+                    ok, errors = self._delete_cassandra_records(sync, res)
+
+                    # if there were errors deleting the data, do not continue sync or data will be duplicated
+                    if errors is None or errors > 0:
+                        log.error('Unable to delete old records from Cassandra')
+                        continue
+                else:
+                    ok = res[0]
+                    errors = len(res[1])
+
+                log.info('%s - Ok: %i Errors: %i - Elastic <<----- Cassandra '
+                         % (sync['name'], ok, errors))
 
             # get the new info from elastic and write to cassandra
             rows = self.get_elasticsearch_latest(sync)
@@ -179,11 +192,11 @@ class PyCassElastic():
 
         # check if could filter
         if sync_params.get('filter_date', None):
-            stmt += '''WHERE {date_col} > {time_last_run}
-                        AND {date_col} <= {time_this_run}
+            stmt += '''WHERE {version_col} > {time_last_run}
+                        AND {version_col} <= {time_this_run}
                         ALLOW FILTERING'''
 
-            stmt = stmt.format(date_col=sync_params['date_col'],
+            stmt = stmt.format(version_col=sync_params['version_col'],
                                time_last_run=unix_time_millis(self.time_last_run),
                                time_this_run=unix_time_millis(self.time_this_run))
 
@@ -209,33 +222,23 @@ class PyCassElastic():
         params = sync_params['cassandra']
         keyspace = self.cassandra['keyspace']
 
-        # get the table schema and remove the 3 fixed columns
+        # get the table schema and order so that we can insert on query in correct order
         schema = self._get_table_schema(keyspace, params['table'])
         if not schema:
             return None, None
-
         cols = schema.keys()
-        #cols.remove(sync_params['version_col'])
-        #cols.remove(sync_params['id_col'])
-        #cols.remove(sync_params['date_col'])
         cols.sort()
 
         # Prepare the statements
         stmt = "INSERT INTO {keyspace}.{table} ("
-               # "{id_col}, " \
-               # "{version_col}, " \
-               # "{date_col},"
         stmt += ", ".join(['%s' % k for k in cols])
         stmt += ") VALUES ("
         stmt += ", ".join([':' + k for k in cols])
         stmt += ") USING TIMESTAMP :p_timestamp "
         stmt = stmt.format(
             keyspace=keyspace,
-            table=params['table']
-            # version_col=sync_params['version_col'],
-            # id_col=sync_params['id_col'],
-            # date_col=sync_params['date_col']
-        )
+            table=params['table'])
+
         try:
             data_statement = session.prepare(stmt)
         except:
@@ -258,7 +261,7 @@ class PyCassElastic():
                 source = row['_source']
                 for col in cols:
                     data[col] = source.get(col, None)
-                date = datetime.strptime(source[sync_params['date_col']],'%Y-%m-%dT%H:%M:%S.%f')
+                date = datetime.strptime(source[sync_params['date_col']], '%Y-%m-%dT%H:%M:%S.%f')
                 data[sync_params['id_col']] = uuid.UUID(row['_id'])
                 data[sync_params['date_col']] = unix_time_millis(date)
                 data['p_timestamp'] = data['version']
@@ -271,7 +274,7 @@ class PyCassElastic():
                 continue
 
             # every x records, commit. There is a limitation on the driver
-            if (count % 65000) == 0:
+            if (count % 5000) == 0:
                 try:
                     # execute the batch
                     session.execute(batch)
@@ -367,6 +370,7 @@ class PyCassElastic():
 
         # execute using scan to get all rows, unordered
         try:
+            es.indices.refresh(index=es_params['index'])
             res = helpers.scan(es, query=query, index=es_params['index'])
             return res
         except:
@@ -470,3 +474,79 @@ class PyCassElastic():
         return {
             'string': 'varchar'
         }
+
+    def _delete_cassandra_records(self, sync_params, res):
+        """
+         Delete the records from Cassandra. The correct version will be brought from elastic search
+        :param sync_params: parameters of this sync
+        :param res: response from the elastic search insert operation
+        :return:
+        """
+        # helpers
+        session = self.cassandra['session']
+        cs_params = sync_params['cassandra']
+        keyspace = self.cassandra['keyspace']
+        re_comp = re.compile('provided \[(.*?)\]')
+
+        # prepare statement
+        stmt = '''delete from  {keyspace}.{table}
+                  where {id_col} = :{id_col} and {version_col}=:{version_col}'''.format(
+            keyspace=keyspace,
+            table=cs_params['table'],
+            version_col=sync_params['version_col'],
+            id_col=sync_params['id_col']
+        )
+        try:
+            data_statement = session.prepare(stmt)
+        except:
+            log.error('Sync: %s - Step: %s - Problem deleting data'
+                      % (sync_params['name'], sys._getframe().f_code.co_name ))
+            log.error(getError())
+            return None, None
+
+        # prepare dictionary with records that should be deleted
+        batch = BatchStatement()
+        count = 0
+        total = 0
+        errors = 0
+        for row in res[1]:
+            # for each "error" entry, check if it is the type of conflict
+            row = row['index']
+            if row['status'] == 409:
+                # TODO: create a log table for deletions
+                # reg ex to find the current version
+                version_col = long(re.findall(re_comp, row['error'])[0])
+                data = {sync_params['id_col']: uuid.UUID(row['_id']),
+                        sync_params['version_col']: version_col}
+                #sync_params['date_col']:version_col}
+                batch.add(data_statement, data)
+                count += 1
+
+            # every x records, commit. There is a limitation on the driver
+            if (count % 65000) == 0:
+                try:
+                    # execute the batch
+                    session.execute(batch)
+                    total += count
+                except:
+                    exc_info = sys.exc_info()
+                    log.error(exc_info[1])
+                    log.error(exc_info[2])
+                    errors += count
+
+                count = 0
+                # hack to get around the 65k limit of python driver
+                batch._statements_and_parameters = []
+
+        if count > 0:
+            try:
+                # execute the batch
+                session.execute(batch)
+                total += count
+            except:
+                log.error('Sync: %s - Step: %s - Problem inserting data'
+                          % (sync_params['name'], sys._getframe().f_code.co_name ))
+                log.error(getError())
+                errors += count
+
+        return total, errors
